@@ -1,210 +1,308 @@
-# Built a Security Onion Home SOC Lab with a Monitored Windows Server 2022 Domain Controller
+# Security Onion Home SOC Lab with Windows Server 2022 Domain Controller
 
-## Objective
-
-The goal of this project was to build a working blue-team home lab that could support future adversary emulation, SIEM analysis, endpoint monitoring, and Active Directory attack simulations.
-
-To achieve this, I deployed a standalone Security Onion instance in VMware Workstation Player, enrolled a Windows Server 2022 endpoint into Elastic Fleet, promoted that server into an Active Directory domain controller, and seeded the domain with intentionally vulnerable content for later attack simulation from Kali Linux.
-
-This project focused on the infrastructure and monitoring foundation required before moving into actual attack, detection, and investigation workflows.
+This project was completed as a supporting home SOC lab build for later detection, investigation, and Active Directory security projects.
 
 ---
 
-## Lab Architecture
+## Overview
 
-The lab was built in VMware Workstation Player 17 and currently consists of:
+This project documents the setup of a Security Onion home lab with a monitored Windows Server 2022 domain controller.
 
-- Security Onion standalone node acting as the SOC / SIEM platform
-- Windows Server 2022 endpoint enrolled into Elastic Fleet
-- Windows Server 2022 promoted to an Active Directory Domain Controller
-- Vulnerable Active Directory content created for later attack simulation
-- Kali Linux planned as the future attacker VM for adversary emulation
+The goal was to build the foundation needed for later blue-team work, including SIEM analysis, endpoint monitoring, Active Directory attack simulation, and alert investigation.
 
-### Core Lab Details
+In this lab, I validated Security Onion node status, confirmed Elastic Fleet agent health, reviewed Security Onion dashboard telemetry, configured a Windows Server 2022 system, created vulnerable Active Directory lab content, and disabled automatic updates to help preserve the lab state.
 
-- Hypervisor: VMware Workstation Player 17
-- Security Onion IP: 192.168.9.132
-- Windows Server hostname: WIN-HS48GJMNOGP
-- AD domain: cs.org
-- Security Onion node name: soc-lab
+This project is not presented as an enterprise SOC deployment. It is a controlled home lab used to support hands-on security monitoring and investigation practice.
 
 ---
 
-## Tools and Technologies Used
+## Why I Built This
 
-- Security Onion 2.4.211
-- Elastic Fleet / Elastic Agent
-- Windows Server 2022
-- Active Directory Domain Services (AD DS)
-- DNS
-- VMware Workstation Player 17
-- PowerShell
-- Local Group Policy Editor
-- GitHub-hosted PowerShell scripts from the book lab resources
+Before running attack simulations or writing detection rules, I needed a working lab environment with reliable monitoring.
 
----
+I built this lab to practice:
 
-## Implementation Summary
+1. Standing up a Security Onion monitoring environment.
+2. Enrolling systems into Elastic Fleet.
+3. Validating endpoint and SIEM visibility.
+4. Preparing a Windows Server 2022 domain controller for later Active Directory security testing.
+5. Creating intentionally vulnerable AD lab content for future detection exercises.
+6. Preserving the lab state so future projects stayed repeatable.
 
-### 1. Deployed Security Onion as a standalone SOC platform
-
-I installed Security Onion in VMware and validated the node state through the Grid interface. This provided the central monitoring platform for the lab, including the SIEM components, containerized services, and management interface.
-
-### 2. Enrolled Windows Server 2022 into Elastic Fleet
-
-I downloaded the customized Windows Elastic Agent installer from Security Onion, configured the required firewall hostgroup allowlists, and enrolled the Windows Server into Fleet. After resolving an initial failed install, the endpoint successfully checked in and appeared as Healthy in Elastic Fleet.
-
-### 3. Verified endpoint monitoring and policy assignment
-
-After successful enrollment, I confirmed that the Windows Server endpoint was active in Fleet and associated with the expected endpoint policy. This established host-level telemetry collection, not just network-level visibility.
-
-### 4. Promoted Windows Server to an Active Directory Domain Controller
-
-Using PowerShell and the chapter lab script, I promoted the server into an AD Domain Controller for the lab domain:
-
-- Domain: cs.org
-- NetBIOS name: CS
-
-After reboot, Server Manager confirmed that AD DS and DNS were active, indicating successful domain controller promotion.
-
-### 5. Seeded vulnerable Active Directory content
-
-I then ran the vulnerable AD setup script to create intentionally insecure lab conditions for future red-vs-blue exercises. The script created and configured vulnerabilities including:
-
-- Kerberoasting exposure
-- AS-REP roasting exposure
-- Passwords stored in descriptions
-- Shared passwords suitable for password spraying
-- DCSync-related privilege assignments
-- SMB signing disabled
-- Nested group issues
-- Weak/default credential patterns
-
-This transformed the domain controller from a plain server into an attackable enterprise-style AD target.
-
-### 6. Disabled automatic updates to preserve lab state
-
-To prevent the server from patching itself, auto-restarting, or drifting away from the intentionally vulnerable configuration, I disabled automatic Windows updates through Local Group Policy Editor.
-
-Policy path used:
-
-`Computer Configuration > Administrative Templates > Windows Components > Windows Update > Configure Automatic Updates`
-
-Setting applied:
-
-- Configure Automatic Updates = Disabled
-
-This preserved the repeatability and vulnerability profile of the lab.
+This project became the base environment for the later detection and investigation work in the portfolio.
 
 ---
 
-## Key Troubleshooting and Fixes
+## Lab Environment
 
-This project involved real troubleshooting rather than simple click-through setup.
-
-### Elastic Agent installation failure
-
-The first Elastic Agent installation attempt failed. I investigated the log output and found that the Windows service had been created, but the expected executable path was missing. This indicated a broken local installation rather than a network communication issue.
-
-### Firewall hostgroup configuration
-
-Before the endpoint could enroll successfully, I had to add the Windows Server IP to the required Security Onion firewall hostgroups used by the agent installer and Fleet communication path:
-
-- elastic_agent_endpoint
-- fleet
-- manager
-
-This allowed the Windows endpoint to communicate properly with the Security Onion services.
-
-### Recovery and clean reinstall
-
-After identifying the incomplete Elastic Agent installation, I removed the broken state, restarted the process, and reran the installer cleanly. The endpoint then appeared healthy in Fleet.
-
-### PowerShell script correction during AD promotion
-
-During the domain controller promotion phase, the original copied command required adjustment because one of the switch parameters did not paste cleanly for direct execution. After correcting the command, the AD DS installation completed successfully and the server rebooted normally.
+| Component | Details |
+|---|---|
+| Hypervisor | VMware Workstation Player 17 |
+| SIEM / SOC Platform | Security Onion |
+| Security Onion Version | 2.4.211 |
+| Security Onion Node | `soc-lab` |
+| Security Onion IP Shown | `192.168.9.132` |
+| Windows Server | Windows Server 2022 |
+| Windows Hostname | `WIN-HS48GJMNOGP` |
+| Active Directory Domain | `cs.org` |
+| Fleet / Endpoint Monitoring | Elastic Fleet / Elastic Agent |
+| Lab Purpose | Foundation for later AD, SIEM, and detection projects |
 
 ---
 
-## Final Validated State
+## Tools Used
 
-At the end of this project, the lab was in the following working state:
-
-- Security Onion standalone node operational
-- Fleet server operational
-- Windows Server endpoint enrolled and healthy in Elastic Fleet
-- Windows Server promoted to Domain Controller for cs.org
-- Vulnerable Active Directory content successfully created
-- Automatic Windows updates disabled to preserve the lab state
-
-### Healthy Elastic Fleet agents observed
-
-- WIN-HS48GJMNOGP
-- FleetServer-soc-lab
-- soc-lab
+| Tool | Purpose |
+|---|---|
+| Security Onion | SIEM, alerting, dashboards, Hunt, Grid, and log review |
+| Elastic Fleet | Agent management and endpoint enrollment review |
+| Elastic Agent | Endpoint telemetry collection |
+| Windows Server 2022 | Domain controller and monitored endpoint |
+| Active Directory Domain Services | Domain controller functionality |
+| PowerShell | Lab setup and script execution |
+| Local Group Policy Editor | Disabled automatic updates for lab stability |
+| VMware Workstation Player | Virtualized lab environment |
 
 ---
 
-## Why This Matters for SOC Work
+## Project Flow
 
-This project is directly relevant to SOC and blue-team skill development because it establishes the infrastructure required for realistic monitoring and investigation workflows.
+The project followed this sequence:
 
-It demonstrates hands-on experience with:
-
-- SIEM platform deployment
-- Endpoint enrollment and health validation
-- Security Onion administration
-- Elastic Fleet usage
-- Windows Server monitoring
-- Active Directory lab creation
-- Vulnerable identity infrastructure preparation
-- Troubleshooting broken agent installation and service issues
-- Preserving repeatable lab conditions for future attack simulation
-
-This lab now supports future work involving:
-
-- Adversary emulation from Kali Linux
-- Attack detection in Security Onion
-- Host and network telemetry analysis
-- Active Directory attack investigation
-- Alert triage and hunting workflows
+1. Reviewed Security Onion Grid status.
+2. Confirmed core Security Onion containers were running.
+3. Confirmed Fleet showed healthy enrolled agents.
+4. Reviewed Security Onion dashboard telemetry and log volume.
+5. Verified Windows Server 2022 was running.
+6. Ran vulnerable AD lab setup content.
+7. Disabled automatic Windows updates through Group Policy.
+8. Confirmed the lab was ready to support later security testing.
 
 ---
 
-## Screenshots
+## Phase 1: Security Onion Grid Review
 
-### 1. Security Onion node health and container status
+Security Onion Grid was reviewed to confirm the node and container status.
 
 ![Security Onion Grid](screenshots/01-security-onion-grid.png)
 
-### 2. Elastic Fleet healthy agents
+### What this proved
 
-![Fleet Healthy Agents](screenshots/02-fleet-healthy-agents.png)
+The Grid view showed the Security Onion node:
 
-### 3. Security Onion dashboard overview
+`soc-lab`
 
-![Security Onion Dashboard](screenshots/03-security-onion-dashboard.png)
+The address shown was:
 
-### 4. Domain Controller confirmation
+`192.168.9.132`
 
-![Domain Controller Confirmation](screenshots/04-domain-controller-server-manager.png)
+The node role was:
 
-### 5. Vulnerable AD content creation
+`Standalone`
 
-![Vulnerable AD Script Output](screenshots/05-vulnerable-ad-script-output.png)
+Several Security Onion containers were shown as running, including services such as Elastic-related components, Kibana, Logstash, Redis, Nginx, and SOC components.
 
-### 6. Lab preservation policy
+This confirmed that the Security Onion lab node was operational enough to support monitoring and later project work.
 
-![Disable Auto Updates GPO](screenshots/06-disable-auto-updates-gpo.png)
+The screenshot also showed high memory usage and an OS update notice. That is useful context because home lab resources and maintenance status can affect lab stability.
 
 ---
 
-## Next Steps
+## Phase 2: Elastic Fleet Agent Health
 
-The next phase of this lab will focus on adversary simulation and blue-team analysis by:
+Elastic Fleet was reviewed to confirm enrolled agent health.
 
-- Preparing or validating the Kali Linux attacker VM
-- Performing reconnaissance and exploitation activity against the vulnerable domain controller
-- Monitoring resulting telemetry in Security Onion
-- Analyzing detections, logs, and endpoint activity
-- Documenting findings as a separate attack-and-detection case study
+![Fleet Healthy Agents](screenshots/02-fleet-healthy-agents.png)
+
+### What this proved
+
+Fleet showed three healthy agents:
+
+- `WIN-HS48GJMNOGP`
+- `FleetServer-soc-lab`
+- `soc-lab`
+
+This confirmed that the Windows Server endpoint and Security Onion-related agents were checking in successfully.
+
+This mattered because later detection projects depended on having endpoint and SIEM telemetry available.
+
+---
+
+## Phase 3: Security Onion Dashboard Review
+
+The Security Onion dashboard was reviewed to confirm log visibility.
+
+![Security Onion Dashboard](screenshots/03-security-onion-dashboard.png)
+
+### What this proved
+
+The dashboard showed Security Onion ingesting and displaying log data.
+
+The screenshot showed over one million documents in the selected time window and visible datasets/modules such as:
+
+- `system.syslog`
+- `soc.server`
+- `zeek.dns`
+- `zeek.conn`
+- `elastic_agent`
+- `suricata`
+- `winlog`
+
+This confirmed that the lab was collecting and displaying useful telemetry across multiple sources.
+
+This screenshot supports lab visibility, not production-level coverage.
+
+---
+
+## Phase 4: Windows Server 2022 Validation
+
+Windows Server Manager was reviewed on the server system.
+
+![Domain Controller Server Manager](screenshots/04-domain-controller-server-manager.png)
+
+### What this proved
+
+The screenshot showed Windows Server Manager open with one managed server.
+
+This supported that the Windows Server system was active and available for configuration.
+
+By itself, this screenshot does not prove every Active Directory configuration detail. It supports the Windows Server lab state used in the broader environment.
+
+---
+
+## Phase 5: Vulnerable Active Directory Lab Content
+
+A vulnerable AD setup script was executed to create intentionally weak lab conditions.
+
+![Vulnerable AD Script Output](screenshots/05-vulnerable-ad-script-output.png)
+
+### What this proved
+
+The script output showed vulnerable AD lab content being created or configured, including items related to:
+
+- Managed service accounts
+- Kerberoasting setup
+- AS-REP roasting setup
+- Passwords in descriptions
+- Default password patterns
+- Password spraying setup
+- DCSync-related setup
+- SMB signing disabled
+
+This helped prepare the domain for later security testing and detection projects.
+
+These conditions were intentionally created in an isolated lab. They should not be interpreted as safe production settings.
+
+---
+
+## Phase 6: Lab Preservation Policy
+
+Automatic Windows updates were disabled through Local Group Policy.
+
+![Disable Auto Updates GPO](screenshots/06-disable-auto-updates-gpo.png)
+
+### What this proved
+
+The screenshot showed the Local Group Policy Editor under Windows Update settings, with automatic updates disabled.
+
+This was done to preserve the lab state and reduce unexpected changes, reboots, or patching during later testing.
+
+This is appropriate for a controlled lab environment, not a general recommendation for production systems.
+
+---
+
+## Key Findings
+
+### 1. Security Onion was operational
+
+The Grid view showed the Security Onion standalone node and running containers.
+
+### 2. Fleet agents were healthy
+
+Elastic Fleet showed healthy agents for the Windows Server endpoint, Fleet Server, and Security Onion node.
+
+### 3. The dashboard showed active telemetry
+
+Security Onion displayed log volume across several datasets and modules.
+
+### 4. Windows Server was available for lab work
+
+Server Manager confirmed the Windows Server system was running and ready for configuration.
+
+### 5. Vulnerable AD content was created for future testing
+
+The script output showed intentionally vulnerable AD conditions being created for later attack and detection exercises.
+
+### 6. Automatic updates were disabled to preserve lab repeatability
+
+The Group Policy screenshot showed update behavior being controlled for lab stability.
+
+---
+
+## Detection and Lab Value
+
+This project provided the foundation for the later portfolio projects.
+
+The value of this lab was not a single detection rule or incident investigation. The value was establishing a working environment where future work could happen:
+
+- Security Onion monitoring
+- Elastic Fleet endpoint management
+- Windows Server and AD-based testing
+- Vulnerable identity lab conditions
+- Repeatable attack and detection scenarios
+
+Without this foundation, later projects such as reconnaissance detection, RDP investigation, EQL detection engineering, and Active Directory attack investigation would not have had a stable environment to build on.
+
+---
+
+## Limitations
+
+This was a home lab foundation project, not a production deployment.
+
+Important limitations:
+
+- The lab was built for learning and controlled security testing.
+- Vulnerable AD settings were intentionally created and should not be used in production.
+- The dashboard screenshot supports telemetry visibility, not complete monitoring coverage.
+- The Server Manager screenshot supports Windows Server availability, not every AD configuration detail.
+- Endpoint health in Fleet confirms agent check-in, but not every telemetry type or detection capability.
+- Some operational details, such as the exact Elastic Agent reinstall steps, are not fully screenshot-supported.
+- A production SOC would require stronger architecture, retention planning, access control, tuning, backups, and monitoring validation.
+
+---
+
+## Improvements for a Future Version
+
+If I expanded this project, I would improve it by:
+
+- Adding a network diagram showing Security Onion, Windows Server, and Kali placement.
+- Capturing clearer Active Directory Domain Services confirmation.
+- Documenting the Elastic Agent enrollment command and troubleshooting steps.
+- Adding screenshots of specific endpoint datasets arriving from the Windows Server.
+- Capturing Windows Event Log visibility in Elastic.
+- Documenting Security Onion firewall hostgroup changes if used.
+- Adding baseline validation queries for endpoint, Suricata, Zeek, and Windows logs.
+- Recording resource allocation decisions for CPU, memory, and storage.
+
+---
+
+## Screenshot Evidence
+
+| Screenshot | What It Shows |
+|---|---|
+| `screenshots/01-security-onion-grid.png` | Security Onion node status and running containers |
+| `screenshots/02-fleet-healthy-agents.png` | Healthy Fleet agents, including Windows Server and Security Onion-related agents |
+| `screenshots/03-security-onion-dashboard.png` | Security Onion dashboard showing log volume and datasets |
+| `screenshots/04-domain-controller-server-manager.png` | Windows Server Manager dashboard |
+| `screenshots/05-vulnerable-ad-script-output.png` | Vulnerable AD lab setup script output |
+| `screenshots/06-disable-auto-updates-gpo.png` | Group Policy view showing automatic updates disabled |
+
+---
+
+## Conclusion
+
+This project established the lab foundation used for later SOC, detection, and Active Directory security projects.
+
+The main result was a working Security Onion home lab with healthy Fleet agents, visible telemetry, a Windows Server environment, vulnerable AD lab content, and settings adjusted to keep the environment repeatable.
+
+It is best understood as the infrastructure layer of the portfolio: not the flashiest project, but the foundation that made the later detection and investigation work possible.
