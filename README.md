@@ -348,7 +348,6 @@ It is best understood as the infrastructure layer of the portfolio: not the flas
 
 **Repository**: [security-onion-home-soc-lab-build](https://github.com/Dmokom1/security-onion-home-soc-lab-build)  
 **Author**: Dmokom1  
-**License**: MIT License  
 **Status**: Active learning project  
 
 *This repository documents my hands‑on security lab work. The content reflects my learning journey and practical application of blue team concepts.*
