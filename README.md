@@ -50,6 +50,27 @@ This project became the base environment for the later detection and investigati
 
 ---
 
+
+
+## Architecture
+
+```mermaid
+graph TD
+    subgraph "Lab Environment"
+        A[Attacker VM<br/>Kali Linux] --> B[Target DC<br/>Windows Server]
+        B --> C[SIEM/Log Aggregator<br/>Security Onion/Elastic]
+        C --> D[Detection Engine<br/>EQL/Sigma Rules]
+    end
+    
+    subgraph "Detection Flow"
+        E[Reconnaissance Activity] --> F[Network Telemetry]
+        F --> G[Log Collection]
+        G --> H[Alert Generation]
+        H --> I[Incident Response]
+    end
+```
+*High‑level lab architecture showing components and detection flow.*
+
 ## Tools Used
 
 | Tool | Purpose |
@@ -299,6 +320,20 @@ If I expanded this project, I would improve it by:
 
 ---
 
+
+
+## What I Learned
+
+This project helped me develop practical skills in:
+
+- **Detection Engineering**: Creating rules to identify suspicious activity
+- **Network Security**: Understanding reconnaissance patterns and anomalies
+- **SIEM Operations**: Configuring and using security monitoring tools
+- **Incident Response**: Investigating and validating security alerts
+- **Lab Building**: Creating realistic training environments for hands‑on practice
+
+The hands‑on experience reinforced theoretical knowledge and improved my ability to translate security concepts into operational detection logic.
+
 ## Conclusion
 
 This project established the lab foundation used for later SOC, detection, and Active Directory security projects.
@@ -306,3 +341,14 @@ This project established the lab foundation used for later SOC, detection, and A
 The main result was a working Security Onion home lab with healthy Fleet agents, visible telemetry, a Windows Server environment, vulnerable AD lab content, and settings adjusted to keep the environment repeatable.
 
 It is best understood as the infrastructure layer of the portfolio: not the flashiest project, but the foundation that made the later detection and investigation work possible.
+
+---
+
+## Repository Information
+
+**Repository**: [security-onion-home-soc-lab-build](https://github.com/Dmokom1/security-onion-home-soc-lab-build)  
+**Author**: Dmokom1  
+**License**: MIT License  
+**Status**: Active learning project  
+
+*This repository documents my hands‑on security lab work. The content reflects my learning journey and practical application of blue team concepts.*
