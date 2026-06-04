@@ -55,19 +55,36 @@ This project became the base environment for the later detection and investigati
 ## Architecture
 
 ```mermaid
-graph TD
-    subgraph "Lab Environment"
-        A[Attacker VM<br/>Kali Linux] --> B[Target DC<br/>Windows Server]
-        B --> C[SIEM/Log Aggregator<br/>Security Onion/Elastic]
-        C --> D[Detection Engine<br/>EQL/Sigma Rules]
+graph TB
+    subgraph "VMware Host"
+        A[VMware Workstation 17 Player]
+    end
+    
+    subgraph "Virtual Machines"
+        B[Windows Server 2022 DC]
+        C[Security Onion]
+        D[Kali Linux]
+    end
+    
+    subgraph "Network Segments"
+        E[CORP Network]
+        F[MGMT Network]
     end
     
     subgraph "Detection Flow"
-        E[Reconnaissance Activity] --> F[Network Telemetry]
-        F --> G[Log Collection]
-        G --> H[Alert Generation]
-        H --> I[Incident Response]
+        G[Windows Events] --> H[Security Onion]
+        H --> I[Elastic/Kibana]
+        I --> J[Alerts & Dashboards]
     end
+    
+    A --> B
+    A --> C
+    A --> D
+    B --> E
+    C --> F
+    D --> E
+    E --> G
+    F --> H
 ```
 *High‑level lab architecture showing components and detection flow.*
 
